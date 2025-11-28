@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub HTML提交插件</title>
+    <style>
+        :root {
+            --primary-color: #2ea44f;
+            --primary-hover: #2c974b;
+            --border-color: #e1e4e8;
+            --background-color: #f6f8fa;
+            --text-color: #24292e;
+            --error-color: #d73a49;
+            --success-color: #28a745;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            padding: 20px;
+            min-width: 400px;
+            max-width: 500px;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        h1 svg {
+            width: 24px;
+            height: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        
+        input, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
+        }
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(46, 164, 79, 0.2);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: monospace;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .submit-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .submit-btn:disabled {
+            background-color: #94d3a2;
+            cursor: not-allowed;
+        }
+        
+        .clear-btn {
+            background-color: #f6f8fa;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        .clear-btn:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .status-message {
+            margin-top: 16px;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            display: none;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            color: var(--success-color);
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .status-error {
+            background-color: #f8d7da;
+            color: var(--error-color);
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        .status-loading {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+        
+        .help-text {
+            font-size: 0.75rem;
+            color: #6a737d;
+            margin-top: 4px;
+        }
+        
+        .section {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .section:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>
+            <svg viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+            </svg>
+            GitHub HTML提交器
+        </h1>
+        
+        <div class="section">
+            <div class="form-group">
+                <label for="repo">GitHub仓库</label>
+                <input type="text" id="repo" placeholder="username/repository">
+                <div class="help-text">格式：用户名/仓库名，例如：octocat/Hello-World</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="token">GitHub访问令牌</label>
+                <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+                <div class="help-text">需要具有仓库写入权限的Personal Access Token</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="filepath">文件路径</label>
+                <input type="text" id="filepath" placeholder="docs/index.html" value="index.html">
+                <div class="help-text">文件在仓库中的路径，例如：docs/index.html</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="commit-message">提交信息</label>
+                <input type="text" id="commit-message" placeholder="添加HTML文件" value="添加HTML文件">
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="form-group">
+                <label for="html-content">HTML内容</label>
+                <textarea id="html-content" placeholder="粘贴AI生成的HTML代码..."></textarea>
+                <div class="help-text">可以直接粘贴HTML代码，插件会自动处理</div>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button id="clear-btn" class="clear-btn">清空</button>
+            <button id="submit-btn" class="submit-btn">提交到GitHub</button>
+        </div>
+        
+        <div id="status-message" class="status-message"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const repoInput = document.getElementById('repo');
+            const tokenInput = document.getElementById('token');
+            const filepathInput = document.getElementById('filepath');
+            const commitMessageInput = document.getElementById('commit-message');
+            const htmlContentInput = document.getElementById('html-content');
+            const submitBtn = document.getElementById('submit-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const statusMessage = document.getElementById('status-message');
+            
+            // 从存储中加载数据
+            chrome.storage.local.get(['repo', 'token', 'filepath'], function(result) {
+                if (result.repo) repoInput.value = result.repo;
+                if (result.token) tokenInput.value = result.token;
+                if (result.filepath) filepathInput.value = result.filepath;
+            });
+            
+            // 清空按钮事件
+            clearBtn.addEventListener('click', function() {
+                htmlContentInput.value = '';
+                statusMessage.textContent = '';
+                statusMessage.className = 'status-message';
+            });
+            
+            // 提交按钮事件
+            submitBtn.addEventListener('click', async function() {
+                const repo = repoInput.value.trim();
+                const token = tokenInput.value.trim();
+                const filepath = filepathInput.value.trim();
+                const commitMessage = commitMessageInput.value.trim() || '添加HTML文件';
+                const htmlContent = htmlContentInput.value.trim();
+                
+                // 验证输入
+                if (!repo) {
+                    showStatus('请输入GitHub仓库', 'error');
+                    return;
+                }
+                
+                if (!token) {
+                    showStatus('请输入GitHub访问令牌', 'error');
+                    return;
+                }
+                
+                if (!filepath) {
+                    showStatus('请输入文件路径', 'error');
+                    return;
+                }
+                
+                if (!htmlContent) {
+                    showStatus('请输入HTML内容', 'error');
+                    return;
+                }
+                
+                // 保存设置
+                chrome.storage.local.set({
+                    repo: repo,
+                    token: token,
+                    filepath: filepath
+                });
+                
+                // 显示加载状态
+                submitBtn.disabled = true;
+                showStatus('正在提交到GitHub...', 'loading');
+                
+                try {
+                    // 调用GitHub API提交文件
+                    const result = await submitToGitHub(repo, token, filepath, commitMessage, htmlContent);
+                    
+                    if (result.success) {
+                        showStatus(`文件已成功提交到 ${result.fileUrl}`, 'success');
+                        htmlContentInput.value = '';
+                    } else {
+                        showStatus(`提交失败: ${result.message}`, 'error');
+                    }
+                } catch (error) {
+                    showStatus(`提交出错: ${error.message}`, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            });
+            
+            // 显示状态消息
+            function showStatus(message, type) {
+                statusMessage.textContent = message;
+                statusMessage.className = 'status-message';
+                
+                if (type === 'success') {
+                    statusMessage.classList.add('status-success');
+                } else if (type === 'error') {
+                    statusMessage.classList.add('status-error');
+                } else if (type === 'loading') {
+                    statusMessage.classList.add('status-loading');
+                }
+            }
+            
+            // 提交到GitHub
+            async function submitToGitHub(repo, token, filepath, commitMessage, content) {
+                // 构建API URL
+                const apiUrl = `https://api.github.com/repos/${repo}/contents/${filepath}`;
+                
+                // 检查文件是否已存在
+                let sha = null;
+                try {
+                    const response = await fetch(apiUrl, {
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const fileData = await response.json();
+                        sha = fileData.sha;
+                    }
+                } catch (error) {
+                    // 文件不存在是正常情况，继续创建新文件
+                }
+                
+                // 准备提交数据
+                const data = {
+                    message: commitMessage,
+                    content: btoa(unescape(encodeURIComponent(content))), // Base64编码
+                    sha: sha // 如果文件存在，需要提供SHA以更新文件
+                };
+                
+                // 提交到GitHub
+                const response = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    return {
+                        success: true,
+                        fileUrl: result.content.html_url
+                    };
+                } else {
+                    return {
+                        success: false,
+                        message: result.message || '未知错误'
+                    };
+                }
+            }
+        });
+    </script>
+</body>
+</html>
