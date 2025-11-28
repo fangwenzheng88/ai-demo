@@ -3,436 +3,374 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>图片src拦截与动态修改</title>
+    <title>GitHub HTML提交插件</title>
     <style>
+        :root {
+            --primary-color: #2ea44f;
+            --primary-hover: #2c974b;
+            --border-color: #e1e4e8;
+            --background-color: #f6f8fa;
+            --text-color: #24292e;
+            --error-color: #d73a49;
+            --success-color: #28a745;
+        }
+        
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background-color: var(--background-color);
+            color: var(--text-color);
             padding: 20px;
-            min-height: 100vh;
+            min-width: 400px;
+            max-width: 500px;
         }
+        
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         }
-        header {
-            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
-            color: white;
-            padding: 30px 20px;
-            text-align: center;
-        }
+        
         h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.9;
-        }
-        .content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            padding: 30px;
-        }
-        @media (max-width: 768px) {
-            .content {
-                grid-template-columns: 1fr;
-            }
-        }
-        .panel {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-        h2 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #eaecef;
-        }
-        .method {
-            margin-bottom: 25px;
-        }
-        h3 {
-            color: #3498db;
-            margin: 15px 0 10px;
-        }
-        p {
-            margin-bottom: 15px;
-        }
-        .code {
-            background: #2d3748;
-            color: #e2e8f0;
-            padding: 15px;
-            border-radius: 6px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9rem;
-            overflow-x: auto;
-            margin: 15px 0;
-        }
-        button {
-            background: #3498db;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background 0.3s;
-            margin: 5px;
-        }
-        button:hover {
-            background: #2980b9;
-        }
-        .demo-area {
-            margin-top: 20px;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #eaecef;
-        }
-        .image-container {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: var(--text-color);
             display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 15px;
+            align-items: center;
+            gap: 10px;
         }
-        .image-container img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 6px;
-            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s;
+        
+        h1 svg {
+            width: 24px;
+            height: 24px;
         }
-        .image-container img:hover {
-            transform: scale(1.03);
+        
+        .form-group {
+            margin-bottom: 16px;
         }
-        .status {
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 6px;
-            background: #e8f4fd;
-            border-left: 4px solid #3498db;
+        
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 0.875rem;
         }
-        footer {
-            text-align: center;
-            padding: 20px;
-            background: #f8f9fa;
-            color: #6c757d;
-            border-top: 1px solid #eaecef;
+        
+        input, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 0.875rem;
+            transition: border-color 0.2s;
         }
-        .toggle-buttons {
+        
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(46, 164, 79, 0.2);
+        }
+        
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: monospace;
+        }
+        
+        .button-group {
             display: flex;
             gap: 10px;
-            margin-bottom: 15px;
+            margin-top: 20px;
         }
-        .toggle-buttons button {
+        
+        button {
             flex: 1;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
         }
-        .active {
-            background: #2c3e50 !important;
+        
+        .submit-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .submit-btn:hover {
+            background-color: var(--primary-hover);
+        }
+        
+        .submit-btn:disabled {
+            background-color: #94d3a2;
+            cursor: not-allowed;
+        }
+        
+        .clear-btn {
+            background-color: #f6f8fa;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        .clear-btn:hover {
+            background-color: #f3f4f6;
+        }
+        
+        .status-message {
+            margin-top: 16px;
+            padding: 10px;
+            border-radius: 4px;
+            font-size: 0.875rem;
+            display: none;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            color: var(--success-color);
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+        
+        .status-error {
+            background-color: #f8d7da;
+            color: var(--error-color);
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+        
+        .status-loading {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+        
+        .help-text {
+            font-size: 0.75rem;
+            color: #6a737d;
+            margin-top: 4px;
+        }
+        
+        .section {
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .section:last-child {
+            border-bottom: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>图片SRC拦截与动态修改</h1>
-            <p class="subtitle">前端实现图片资源拦截与替换的多种方法</p>
-        </header>
+        <h1>
+            <svg viewBox="0 0 16 16" fill="currentColor">
+                <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"></path>
+            </svg>
+            GitHub HTML提交器
+        </h1>
         
-        <div class="content">
-            <div class="panel">
-                <h2>实现方法</h2>
-                
-                <div class="method">
-                    <h3>1. MutationObserver 监听DOM变化</h3>
-                    <p>监听DOM树变化，当有新的img元素添加时，修改其src属性。</p>
-                    <div class="code">
-// 创建MutationObserver实例
-const observer = new MutationObserver((mutations) => {
-  mutations.forEach((mutation) => {
-    if (mutation.type === 'childList') {
-      mutation.addedNodes.forEach((node) => {
-        if (node.tagName === 'IMG') {
-          // 拦截并修改图片src
-          interceptImage(node);
-        }
-      });
-    }
-  });
-});
-
-// 开始观察
-observer.observe(document.body, {
-  childList: true,
-  subtree: true
-});
-                    </div>
-                    <button id="toggleObserver">启用MutationObserver</button>
-                </div>
-                
-                <div class="method">
-                    <h3>2. 重写Image构造函数</h3>
-                    <p>重写全局Image构造函数，拦截所有通过new Image()创建的图片。</p>
-                    <div class="code">
-// 保存原始Image构造函数
-const OriginalImage = window.Image;
-
-// 重写Image构造函数
-window.Image = function() {
-  const img = new OriginalImage();
-  
-  // 拦截src属性设置
-  let _src = '';
-  Object.defineProperty(img, 'src', {
-    get: function() {
-      return _src;
-    },
-    set: function(value) {
-      // 修改图片URL
-      _src = modifyImageUrl(value);
-      img.setAttribute('src', _src);
-    }
-  });
-  
-  return img;
-};
-                    </div>
-                    <button id="toggleImageOverride">启用Image重写</button>
-                </div>
-                
-                <div class="method">
-                    <h3>3. 拦截HTMLImageElement的src属性</h3>
-                    <p>通过修改HTMLImageElement原型上的src属性，拦截所有img元素的src设置。</p>
-                    <div class="code">
-// 获取原始src属性描述符
-const originalDescriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
-
-// 重写src属性
-Object.defineProperty(HTMLImageElement.prototype, 'src', {
-  get: function() {
-    return originalDescriptor.get.call(this);
-  },
-  set: function(value) {
-    // 修改图片URL
-    const modifiedUrl = modifyImageUrl(value);
-    originalDescriptor.set.call(this, modifiedUrl);
-  }
-});
-                    </div>
-                    <button id="toggleSrcIntercept">启用src拦截</button>
-                </div>
-                
-                <div class="method">
-                    <h3>4. Service Worker拦截网络请求</h3>
-                    <p>通过Service Worker拦截图片网络请求，实现更底层的资源替换。</p>
-                    <div class="code">
-// 在Service Worker中
-self.addEventListener('fetch', (event) => {
-  if (event.request.destination === 'image') {
-    event.respondWith(
-      // 修改图片请求URL或返回替代图片
-      fetch(modifyImageUrl(event.request.url))
-    );
-  }
-});
-                    </div>
-                    <p class="status">注意：Service Worker需要HTTPS环境，此处仅作演示。</p>
-                </div>
+        <div class="section">
+            <div class="form-group">
+                <label for="repo">GitHub仓库</label>
+                <input type="text" id="repo" placeholder="username/repository">
+                <div class="help-text">格式：用户名/仓库名，例如：octocat/Hello-World</div>
             </div>
             
-            <div class="panel">
-                <h2>演示区域</h2>
-                <p>点击下方按钮添加图片，观察拦截效果：</p>
-                
-                <div class="toggle-buttons">
-                    <button id="addImage">添加原始图片</button>
-                    <button id="addImageJs">通过JS添加图片</button>
-                </div>
-                
-                <div class="demo-area">
-                    <div id="status" class="status">
-                        状态: 等待操作...
-                    </div>
-                    <div class="image-container" id="imageContainer">
-                        <!-- 图片将在这里显示 -->
-                    </div>
-                </div>
-                
-                <h3>替换规则</h3>
-                <p>当前演示将所有图片替换为占位图片：</p>
-                <div class="code">
-function modifyImageUrl(originalUrl) {
-  // 这里可以实现各种替换逻辑
-  // 演示中统一替换为占位图片
-  const placeholderBase = 'https://picsum.photos/';
-  const sizes = ['200/150', '300/200', '250/180'];
-  const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
-  
-  return `${placeholderBase}${randomSize}?random=${Math.floor(Math.random() * 1000)}`;
-}
-                </div>
+            <div class="form-group">
+                <label for="token">GitHub访问令牌</label>
+                <input type="password" id="token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+                <div class="help-text">需要具有仓库写入权限的Personal Access Token</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="filepath">文件路径</label>
+                <input type="text" id="filepath" placeholder="docs/index.html" value="index.html">
+                <div class="help-text">文件在仓库中的路径，例如：docs/index.html</div>
+            </div>
+            
+            <div class="form-group">
+                <label for="commit-message">提交信息</label>
+                <input type="text" id="commit-message" placeholder="添加HTML文件" value="添加HTML文件">
             </div>
         </div>
         
-        <footer>
-            <p>图片SRC拦截与动态修改演示 &copy; 2023</p>
-        </footer>
+        <div class="section">
+            <div class="form-group">
+                <label for="html-content">HTML内容</label>
+                <textarea id="html-content" placeholder="粘贴AI生成的HTML代码..."></textarea>
+                <div class="help-text">可以直接粘贴HTML代码，插件会自动处理</div>
+            </div>
+        </div>
+        
+        <div class="button-group">
+            <button id="clear-btn" class="clear-btn">清空</button>
+            <button id="submit-btn" class="submit-btn">提交到GitHub</button>
+        </div>
+        
+        <div id="status-message" class="status-message"></div>
     </div>
 
     <script>
-        // 状态显示
-        const statusEl = document.getElementById('status');
-        
-        // 修改图片URL的函数
-        function modifyImageUrl(originalUrl) {
-            // 这里可以实现各种替换逻辑
-            // 演示中统一替换为占位图片
-            const placeholderBase = 'https://picsum.photos/';
-            const sizes = ['200/150', '300/200', '250/180'];
-            const randomSize = sizes[Math.floor(Math.random() * sizes.length)];
+        document.addEventListener('DOMContentLoaded', function() {
+            const repoInput = document.getElementById('repo');
+            const tokenInput = document.getElementById('token');
+            const filepathInput = document.getElementById('filepath');
+            const commitMessageInput = document.getElementById('commit-message');
+            const htmlContentInput = document.getElementById('html-content');
+            const submitBtn = document.getElementById('submit-btn');
+            const clearBtn = document.getElementById('clear-btn');
+            const statusMessage = document.getElementById('status-message');
             
-            return `${placeholderBase}${randomSize}?random=${Math.floor(Math.random() * 1000)}`;
-        }
-        
-        // 拦截单个图片
-        function interceptImage(imgElement) {
-            const originalSrc = imgElement.src;
-            const newSrc = modifyImageUrl(originalSrc);
-            imgElement.src = newSrc;
+            // 从存储中加载数据
+            chrome.storage.local.get(['repo', 'token', 'filepath'], function(result) {
+                if (result.repo) repoInput.value = result.repo;
+                if (result.token) tokenInput.value = result.token;
+                if (result.filepath) filepathInput.value = result.filepath;
+            });
             
-            statusEl.innerHTML = `已拦截图片: <br>原始: ${originalSrc || '空'}<br>替换为: ${newSrc}`;
-        }
-        
-        // 方法1: MutationObserver
-        let observer = null;
-        document.getElementById('toggleObserver').addEventListener('click', function() {
-            if (observer) {
-                observer.disconnect();
-                observer = null;
-                this.textContent = '启用MutationObserver';
-                this.classList.remove('active');
-                statusEl.textContent = '已禁用MutationObserver';
-            } else {
-                observer = new MutationObserver((mutations) => {
-                    mutations.forEach((mutation) => {
-                        if (mutation.type === 'childList') {
-                            mutation.addedNodes.forEach((node) => {
-                                if (node.tagName === 'IMG') {
-                                    interceptImage(node);
-                                }
-                            });
-                        }
-                    });
+            // 清空按钮事件
+            clearBtn.addEventListener('click', function() {
+                htmlContentInput.value = '';
+                statusMessage.textContent = '';
+                statusMessage.className = 'status-message';
+            });
+            
+            // 提交按钮事件
+            submitBtn.addEventListener('click', async function() {
+                const repo = repoInput.value.trim();
+                const token = tokenInput.value.trim();
+                const filepath = filepathInput.value.trim();
+                const commitMessage = commitMessageInput.value.trim() || '添加HTML文件';
+                const htmlContent = htmlContentInput.value.trim();
+                
+                // 验证输入
+                if (!repo) {
+                    showStatus('请输入GitHub仓库', 'error');
+                    return;
+                }
+                
+                if (!token) {
+                    showStatus('请输入GitHub访问令牌', 'error');
+                    return;
+                }
+                
+                if (!filepath) {
+                    showStatus('请输入文件路径', 'error');
+                    return;
+                }
+                
+                if (!htmlContent) {
+                    showStatus('请输入HTML内容', 'error');
+                    return;
+                }
+                
+                // 保存设置
+                chrome.storage.local.set({
+                    repo: repo,
+                    token: token,
+                    filepath: filepath
                 });
                 
-                observer.observe(document.body, {
-                    childList: true,
-                    subtree: true
-                });
+                // 显示加载状态
+                submitBtn.disabled = true;
+                showStatus('正在提交到GitHub...', 'loading');
                 
-                this.textContent = '禁用MutationObserver';
-                this.classList.add('active');
-                statusEl.textContent = '已启用MutationObserver，将拦截新添加的图片';
+                try {
+                    // 调用GitHub API提交文件
+                    const result = await submitToGitHub(repo, token, filepath, commitMessage, htmlContent);
+                    
+                    if (result.success) {
+                        showStatus(`文件已成功提交到 ${result.fileUrl}`, 'success');
+                        htmlContentInput.value = '';
+                    } else {
+                        showStatus(`提交失败: ${result.message}`, 'error');
+                    }
+                } catch (error) {
+                    showStatus(`提交出错: ${error.message}`, 'error');
+                } finally {
+                    submitBtn.disabled = false;
+                }
+            });
+            
+            // 显示状态消息
+            function showStatus(message, type) {
+                statusMessage.textContent = message;
+                statusMessage.className = 'status-message';
+                
+                if (type === 'success') {
+                    statusMessage.classList.add('status-success');
+                } else if (type === 'error') {
+                    statusMessage.classList.add('status-error');
+                } else if (type === 'loading') {
+                    statusMessage.classList.add('status-loading');
+                }
             }
-        });
-        
-        // 方法2: 重写Image构造函数
-        let imageOverridden = false;
-        let OriginalImage = window.Image;
-        
-        document.getElementById('toggleImageOverride').addEventListener('click', function() {
-            if (imageOverridden) {
-                window.Image = OriginalImage;
-                imageOverridden = false;
-                this.textContent = '启用Image重写';
-                this.classList.remove('active');
-                statusEl.textContent = '已禁用Image构造函数重写';
-            } else {
-                window.Image = function() {
-                    const img = new OriginalImage();
-                    
-                    let _src = '';
-                    Object.defineProperty(img, 'src', {
-                        get: function() {
-                            return _src;
-                        },
-                        set: function(value) {
-                            _src = modifyImageUrl(value);
-                            img.setAttribute('src', _src);
-                            statusEl.innerHTML = `Image构造函数拦截: <br>替换为: ${_src}`;
+            
+            // 提交到GitHub
+            async function submitToGitHub(repo, token, filepath, commitMessage, content) {
+                // 构建API URL
+                const apiUrl = `https://api.github.com/repos/${repo}/contents/${filepath}`;
+                
+                // 检查文件是否已存在
+                let sha = null;
+                try {
+                    const response = await fetch(apiUrl, {
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
                         }
                     });
                     
-                    return img;
+                    if (response.ok) {
+                        const fileData = await response.json();
+                        sha = fileData.sha;
+                    }
+                } catch (error) {
+                    // 文件不存在是正常情况，继续创建新文件
+                }
+                
+                // 准备提交数据
+                const data = {
+                    message: commitMessage,
+                    content: btoa(unescape(encodeURIComponent(content))), // Base64编码
+                    sha: sha // 如果文件存在，需要提供SHA以更新文件
                 };
                 
-                imageOverridden = true;
-                this.textContent = '禁用Image重写';
-                this.classList.add('active');
-                statusEl.textContent = '已启用Image构造函数重写，将拦截通过new Image()创建的图片';
-            }
-        });
-        
-        // 方法3: 拦截HTMLImageElement的src属性
-        let srcIntercepted = false;
-        const originalDescriptor = Object.getOwnPropertyDescriptor(HTMLImageElement.prototype, 'src');
-        
-        document.getElementById('toggleSrcIntercept').addEventListener('click', function() {
-            if (srcIntercepted) {
-                Object.defineProperty(HTMLImageElement.prototype, 'src', originalDescriptor);
-                srcIntercepted = false;
-                this.textContent = '启用src拦截';
-                this.classList.remove('active');
-                statusEl.textContent = '已禁用HTMLImageElement src属性拦截';
-            } else {
-                Object.defineProperty(HTMLImageElement.prototype, 'src', {
-                    get: function() {
-                        return originalDescriptor.get.call(this);
+                // 提交到GitHub
+                const response = await fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/vnd.github.v3+json'
                     },
-                    set: function(value) {
-                        const modifiedUrl = modifyImageUrl(value);
-                        originalDescriptor.set.call(this, modifiedUrl);
-                        statusEl.innerHTML = `src属性拦截: <br>替换为: ${modifiedUrl}`;
-                    }
+                    body: JSON.stringify(data)
                 });
                 
-                srcIntercepted = true;
-                this.textContent = '禁用src拦截';
-                this.classList.add('active');
-                statusEl.textContent = '已启用HTMLImageElement src属性拦截，将拦截所有图片src设置';
+                const result = await response.json();
+                
+                if (response.ok) {
+                    return {
+                        success: true,
+                        fileUrl: result.content.html_url
+                    };
+                } else {
+                    return {
+                        success: false,
+                        message: result.message || '未知错误'
+                    };
+                }
             }
-        });
-        
-        // 演示功能
-        document.getElementById('addImage').addEventListener('click', function() {
-            const imgContainer = document.getElementById('imageContainer');
-            const img = document.createElement('img');
-            img.src = 'https://example.com/original-image.jpg';
-            img.alt = '演示图片';
-            imgContainer.appendChild(img);
-        });
-        
-        document.getElementById('addImageJs').addEventListener('click', function() {
-            const imgContainer = document.getElementById('imageContainer');
-            const img = new Image();
-            img.src = 'https://example.com/js-created-image.jpg';
-            img.alt = 'JS创建的图片';
-            imgContainer.appendChild(img);
         });
     </script>
 </body>
